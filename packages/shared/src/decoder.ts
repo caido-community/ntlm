@@ -214,8 +214,8 @@ export function decodeType3Message(authHeader: string): NtlmType3Message {
     ntlmResponseOffset + ntlmResponseLength,
   );
 
-  const targetNameLength = buf.readUInt16LE(28);
-  const targetNameOffset = buf.readUInt32LE(32);
+  const domainLength = buf.readUInt16LE(28);
+  const domainOffset = buf.readUInt32LE(32);
 
   const usernameLength = buf.readUInt16LE(36);
   const usernameOffset = buf.readUInt32LE(40);
@@ -226,13 +226,9 @@ export function decodeType3Message(authHeader: string): NtlmType3Message {
   const hasUnicode = ntlmResponseLength > 24;
   const encoding: NtlmEncoding = hasUnicode ? "ucs2" : "ascii";
 
-  const targetName =
-    targetNameLength > 0
-      ? buf.toString(
-          encoding,
-          targetNameOffset,
-          targetNameOffset + targetNameLength,
-        )
+  const domain =
+    domainLength > 0
+      ? buf.toString(encoding, domainOffset, domainOffset + domainLength)
       : "";
 
   const username =
@@ -259,7 +255,7 @@ export function decodeType3Message(authHeader: string): NtlmType3Message {
     messageType: 3,
     lmResponse,
     ntlmResponse,
-    targetName,
+    domain,
     username,
     workstation,
     flags,

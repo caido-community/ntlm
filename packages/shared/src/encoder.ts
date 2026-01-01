@@ -1,14 +1,6 @@
 import { Buffer } from "buffer";
 
-import {
-  NTLMFLAG_NEGOTIATE_ALWAYS_SIGN,
-  NTLMFLAG_NEGOTIATE_NTLM2_KEY,
-  NTLMFLAG_NEGOTIATE_NTLM_KEY,
-  NTLMFLAG_NEGOTIATE_OEM,
-  NTLMFLAG_NEGOTIATE_TARGET_INFO,
-  NTLMFLAG_REQUEST_TARGET,
-  NTLMFLAG_TARGET_TYPE_DOMAIN,
-} from "./flags.js";
+import * as flags from "./flags.js";
 import {
   createLMHash,
   createLMResponse,
@@ -27,42 +19,47 @@ export function createBasicMessage(user: string, pwd: string): string {
 
 export function createType1Message(
   workstation: string = "",
-  target: string = "",
+  domain: string = "",
 ): string {
   let dataPos = 32;
   let pos = 0;
   const buf = Buffer.alloc(1024);
 
+  // Protocol
   buf.write(NTLM_SIGNATURE, pos, NTLM_SIGNATURE.length, "ascii");
   pos += NTLM_SIGNATURE.length;
 
+  // Message Type
   buf.writeUInt32LE(1, pos);
   pos += 4;
 
+  // Flags
   buf.writeUInt32LE(
-    NTLMFLAG_NEGOTIATE_OEM |
-      NTLMFLAG_REQUEST_TARGET |
-      NTLMFLAG_NEGOTIATE_NTLM_KEY |
-      NTLMFLAG_NEGOTIATE_NTLM2_KEY |
-      NTLMFLAG_NEGOTIATE_ALWAYS_SIGN,
+    flags.NTLMFLAG_NEGOTIATE_OEM |
+      flags.NTLMFLAG_REQUEST_TARGET |
+      flags.NTLMFLAG_NEGOTIATE_NTLM_KEY |
+      flags.NTLMFLAG_NEGOTIATE_NTLM2_KEY |
+      flags.NTLMFLAG_NEGOTIATE_ALWAYS_SIGN,
     pos,
   );
   pos += 4;
 
-  buf.writeUInt16LE(target.length, pos);
+  // Domain
+  buf.writeUInt16LE(domain.length, pos); // Length
   pos += 2;
-  buf.writeUInt16LE(target.length, pos);
+  buf.writeUInt16LE(domain.length, pos); // Max length
   pos += 2;
-  buf.writeUInt32LE(target.length === 0 ? 0 : dataPos, pos);
+  buf.writeUInt32LE(domain.length === 0 ? 0 : dataPos, pos);
   pos += 4;
 
-  if (target.length > 0) {
-    dataPos += buf.write(target, dataPos, "ascii");
+  if (domain.length > 0) {
+    dataPos += buf.write(domain, dataPos, "ascii");
   }
 
-  buf.writeUInt16LE(workstation.length, pos);
+  // Workstation
+  buf.writeUInt16LE(workstation.length, pos); // Length
   pos += 2;
-  buf.writeUInt16LE(workstation.length, pos);
+  buf.writeUInt16LE(workstation.length, pos); // Max length
   pos += 2;
   buf.writeUInt32LE(workstation.length === 0 ? 0 : dataPos, pos);
 
@@ -91,14 +88,15 @@ export function createType2Message(options: CreateType2MessageOptions): string {
   buf.writeUInt32LE(2, pos);
   pos += 4;
 
-  let flags =
-    NTLMFLAG_NEGOTIATE_OEM |
-    NTLMFLAG_REQUEST_TARGET |
-    NTLMFLAG_NEGOTIATE_NTLM_KEY |
-    NTLMFLAG_TARGET_TYPE_DOMAIN;
+  let negotiateFlags =
+    flags.NTLMFLAG_NEGOTIATE_OEM |
+    flags.NTLMFLAG_REQUEST_TARGET |
+    flags.NTLMFLAG_NEGOTIATE_NTLM_KEY |
+    flags.NTLMFLAG_TARGET_TYPE_DOMAIN;
 
   if (version === 2) {
-    flags |= NTLMFLAG_NEGOTIATE_NTLM2_KEY | NTLMFLAG_NEGOTIATE_TARGET_INFO;
+    negotiateFlags |=
+      flags.NTLMFLAG_NEGOTIATE_NTLM2_KEY | flags.NTLMFLAG_NEGOTIATE_TARGET_INFO;
   }
 
   const targetNameBytes = Buffer.from(targetName, "ascii");
@@ -111,7 +109,7 @@ export function createType2Message(options: CreateType2MessageOptions): string {
   buf.writeUInt32LE(dataPos, pos);
   pos += 4;
 
-  buf.writeUInt32LE(flags, pos);
+  buf.writeUInt32LE(negotiateFlags, pos);
   pos += 4;
 
   const challengeBuffer =
@@ -182,12 +180,12 @@ export function createType3Message(
   username: string,
   password: string,
   workstation: string = "",
-  target?: string,
+  domain?: string,
 ): string {
   let dataPos = 52;
   const buf = Buffer.alloc(1024);
 
-  const resolvedTarget = target ?? type2Message.targetName;
+  const resolvedDomain = domain ?? type2Message.targetName;
 
   buf.write(NTLM_SIGNATURE, 0, NTLM_SIGNATURE.length, "ascii");
 
@@ -203,14 +201,14 @@ export function createType3Message(
       username,
       ntlmHash,
       nonce,
-      resolvedTarget,
+      resolvedDomain,
     );
     const ntlmv2 = createNTLMv2Response(
       type2Message,
       username,
       ntlmHash,
       nonce,
-      resolvedTarget,
+      resolvedDomain,
     );
 
     buf.writeUInt16LE(lmv2.length, 12);
@@ -249,13 +247,13 @@ export function createType3Message(
 
   const targetLength =
     type2Message.encoding === "ascii"
-      ? resolvedTarget.length
-      : resolvedTarget.length * 2;
+      ? resolvedDomain.length
+      : resolvedDomain.length * 2;
   buf.writeUInt16LE(targetLength, 28);
   buf.writeUInt16LE(targetLength, 30);
   buf.writeUInt32LE(dataPos, 32);
 
-  dataPos += buf.write(resolvedTarget, dataPos, type2Message.encoding);
+  dataPos += buf.write(resolvedDomain, dataPos, type2Message.encoding);
 
   const usernameLength =
     type2Message.encoding === "ascii" ? username.length : username.length * 2;

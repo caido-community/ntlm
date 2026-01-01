@@ -39,7 +39,7 @@ export type NtlmType3Message = {
   messageType: 3;
   lmResponse: Buffer;
   ntlmResponse: Buffer;
-  targetName: string;
+  domain: string;
   username: string;
   workstation: string;
   flags: number;

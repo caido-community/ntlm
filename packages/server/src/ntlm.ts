@@ -103,7 +103,7 @@ function validateType3V2(
   }
 
   const ntlmHash = createNTLMHash(user.password);
-  const targetName = type3.targetName || type2Message.targetName;
+  const targetName = type3.domain || type2Message.targetName;
 
   const clientNonce = type3.lmResponse.subarray(16, 24).toString("hex");
 
