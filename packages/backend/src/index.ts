@@ -1,3 +1,5 @@
+import { Buffer } from "buffer";
+
 import type { DefineAPI, SDK } from "caido:plugin";
 import {
   type Request,

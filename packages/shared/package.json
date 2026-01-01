@@ -1,0 +1,21 @@
+{
+  "name": "shared",
+  "version": "0.0.0",
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    "types": "./src/index.ts",
+    "default": "./dist/index.js"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc || true"
+  },
+  "dependencies": {
+    "js-md4": "0.3.2",
+    "des.js": "1.1.0"
+  },
+  "devDependencies": {
+    "@caido/sdk-backend": "0.54.1"
+  }
+}

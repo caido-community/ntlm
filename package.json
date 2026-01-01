@@ -6,7 +6,10 @@
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint ./packages/**/src --fix",
     "knip": "knip",
-    "build": "caido-dev build",
+    "run:server": "pnpm build:shared && pnpm -r dev --filter server",
+    "build": "pnpm build:shared && pnpm build:plugin",
+    "build:plugin": "caido-dev build",
+    "build:shared": "pnpm --filter shared build",
     "watch": "caido-dev watch"
   },
   "devDependencies": {
