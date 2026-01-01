@@ -57,9 +57,10 @@ export function createNtlmMiddleware(version: NtlmVersion) {
           return;
         }
 
-        const { header, challenge } = generateType2(version);
+        const { header, challenge, type2Message } = generateType2(version);
         state.stage = "challenge_sent";
         state.challenge = challenge;
+        state.type2Message = type2Message;
         connectionStates.set(connectionId, state);
 
         res.setHeader("WWW-Authenticate", header);
@@ -75,7 +76,12 @@ export function createNtlmMiddleware(version: NtlmVersion) {
           return;
         }
 
-        const user = validateType3(type3, state.challenge, version);
+        const user = validateType3(
+          type3,
+          state.challenge,
+          version,
+          state.type2Message,
+        );
         if (!user) {
           connectionStates.delete(connectionId);
           res.setHeader("WWW-Authenticate", "NTLM");
@@ -118,4 +124,17 @@ export function requireRole(role: "admin") {
 export function cleanupConnection(req: Request): void {
   const connectionId = getConnectionId(req);
   connectionStates.delete(connectionId);
+}
+
+export function logRequests(req: Request, res: Response, next: NextFunction) {
+  const startTime = Date.now();
+
+  res.on("finish", () => {
+    const duration = Date.now() - startTime;
+    console.log(
+      `${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`,
+    );
+  });
+
+  next();
 }

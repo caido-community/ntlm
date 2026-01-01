@@ -2,7 +2,6 @@ import { Buffer } from "buffer";
 import crypto from "crypto";
 
 import des from "des.js";
-import md4 from "js-md4";
 
 import type { NtlmType2Message } from "./types.js";
 
@@ -85,10 +84,9 @@ export function createNTLMResponse(
 }
 
 export function createNTLMHash(password: string): Buffer {
-  const md4sum = md4.create();
+  const md4sum = crypto.createHash("md4");
   md4sum.update(Buffer.from(password, "ucs2"));
-  const digest = Buffer.from(md4sum.digest(), "hex");
-  return digest;
+  return md4sum.digest();
 }
 
 export function createNTLMv2Hash(

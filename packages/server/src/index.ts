@@ -1,9 +1,15 @@
 import express from "express";
 
-import { createNtlmMiddleware, requireRole } from "./middleware.js";
+import {
+  createNtlmMiddleware,
+  logRequests,
+  requireRole,
+} from "./middleware.js";
 
 const app = express();
 const PORT = 3000;
+
+app.use(logRequests);
 
 app.get("/ntlm/v1", createNtlmMiddleware(1), (req, res) => {
   res.json({

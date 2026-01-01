@@ -57,7 +57,7 @@ const ntlm = async (sdk: SDK, request: RequestSpecRaw) => {
 
     // Create the type 3 message
     sdk.console.log(`Creating type 3 message`);
-    const type3Message = createType3Message(type2Message, "testuser", "");
+    const type3Message = createType3Message(type2Message, "user", "password");
 
     // Send the type 3 message
     sdk.console.log(`Setting authorization header: ${type3Message}`);
