@@ -131,8 +131,8 @@ export function createType2Message(options: CreateType2MessageOptions): string {
   // Target Info
   let targetInfoBuffer: Buffer | undefined;
   if (version === 2) {
-    const domainBytes = Buffer.from(targetName, "ucs2");
-    const serverBytes = Buffer.from("SERVER", "ucs2");
+    const domainBytes = Buffer.from(targetName, "utf16le");
+    const serverBytes = Buffer.from("SERVER", "utf16le");
 
     const targetInfoSize = 4 + domainBytes.length + 4 + serverBytes.length + 4;
     targetInfoBuffer = Buffer.alloc(targetInfoSize);

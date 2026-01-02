@@ -86,7 +86,7 @@ export function decodeType2Message(authHeader: string): NtlmType2Message {
   // Flags
   const flags = buf.readUInt32LE(20);
   const encoding: NtlmEncoding =
-    flags & NTLMFLAG_NEGOTIATE_OEM ? "ascii" : "ucs2";
+    flags & NTLMFLAG_NEGOTIATE_OEM ? "ascii" : "utf16le";
   const version: NtlmVersion = flags & NTLMFLAG_NEGOTIATE_NTLM2_KEY ? 2 : 1;
 
   // Challenge
@@ -146,7 +146,7 @@ export function decodeType2Message(authHeader: string): NtlmType2Message {
           break;
         }
 
-        const blockValue = buf.toString("ucs2", pos, pos + blockLength);
+        const blockValue = buf.toString("utf16le", pos, pos + blockLength);
 
         switch (blockType) {
           case 1:

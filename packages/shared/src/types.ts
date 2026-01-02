@@ -1,6 +1,6 @@
 import type { Buffer } from "buffer";
 
-export type NtlmEncoding = "ascii" | "ucs2";
+export type NtlmEncoding = "ascii" | "utf16le";
 
 export type NtlmVersion = 1 | 2;
 

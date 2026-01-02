@@ -97,7 +97,7 @@ export function createNTLMv2Hash(
   authTargetName: string,
 ): Buffer {
   const hmac = crypto.createHmac("md5", ntlmhash);
-  hmac.update(Buffer.from(username.toUpperCase() + authTargetName, "ucs2"));
+  hmac.update(Buffer.from(username.toUpperCase() + authTargetName, "utf16le"));
   return hmac.digest();
 }
 
