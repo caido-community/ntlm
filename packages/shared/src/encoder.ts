@@ -13,10 +13,6 @@ import {
 import { NTLM_SIGNATURE } from "./signature.js";
 import type { NtlmType2Message, NtlmVersion } from "./types.js";
 
-export function createBasicMessage(user: string, pwd: string): string {
-  return "Basic " + Buffer.from(user + ":" + pwd, "utf8").toString("base64");
-}
-
 export function createType1Message(
   workstation: string = "",
   domain: string = "",

@@ -4,6 +4,7 @@ const config: RawConfigurationOrFn = {
   workspaces: {
     ".": {
       entry: ["caido.config.ts", "eslint.config.mjs"],
+      ignoreBinaries: ["dev"],
     },
     "packages/backend": {
       entry: ["src/index.ts"],
@@ -14,6 +15,13 @@ const config: RawConfigurationOrFn = {
       entry: ["src/index.ts"],
       project: ["src/**/*.{ts,tsx,vue}"],
     },
+    "packages/server": {
+      entry: ["src/index.ts"],
+      project: ["src/**/*.ts"],
+    },
+  },
+  ignoreIssues: {
+    "packages/server/src/credentials.ts": ["exports", "types"],
   },
 };
 

@@ -121,11 +121,6 @@ export function requireRole(role: "admin") {
   };
 }
 
-export function cleanupConnection(req: Request): void {
-  const connectionId = getConnectionId(req);
-  connectionStates.delete(connectionId);
-}
-
 export function logRequests(req: Request, res: Response, next: NextFunction) {
   const startTime = Date.now();
 

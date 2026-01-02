@@ -101,9 +101,6 @@ importers:
       des.js:
         specifier: 1.1.0
         version: 1.1.0
-      js-md4:
-        specifier: 0.3.2
-        version: 0.3.2
     devDependencies:
       '@caido/sdk-backend':
         specifier: 0.55.0-beta.0
@@ -1882,9 +1879,6 @@ packages:
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
-
-  js-md4@0.3.2:
-    resolution: {integrity: sha512-/GDnfQYsltsjRswQhN9fhv3EMw2sCpUdrdxyWDOUK7eyD++r3gRhzgiQgc/x4MAv2i1iuQ4lxO5mvqM3vj4bwA==}
 
   js-yaml@4.1.1:
     resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
@@ -4684,8 +4678,6 @@ snapshots:
   jiti@2.6.1: {}
 
   joycon@3.1.1: {}
-
-  js-md4@0.3.2: {}
 
   js-yaml@4.1.1:
     dependencies:

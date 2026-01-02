@@ -6,7 +6,7 @@ export type User = {
   role: UserRole;
 };
 
-export const users: User[] = [
+const users: User[] = [
   { username: "user", password: "password", role: "normal" },
   { username: "admin", password: "admin123", role: "admin" },
 ];
