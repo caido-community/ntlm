@@ -1,5 +1,7 @@
 import express from "express";
 
+import { users } from "./credentials.js";
+import { logger } from "./logger.js";
 import {
   createNtlmMiddleware,
   logRequests,
@@ -8,6 +10,8 @@ import {
 
 const app = express();
 const PORT = 3000;
+
+logger.info({ port: PORT }, "Initializing Express application");
 
 app.use(logRequests);
 
@@ -58,15 +62,32 @@ app.get("/health", (_req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`NTLM mock server running on http://localhost:${PORT}`);
-  console.log("");
-  console.log("Available endpoints:");
-  console.log("  GET /ntlm/v1       - NTLM v1 protected (user or admin)");
-  console.log("  GET /ntlm/v1/admin - NTLM v1 admin only");
-  console.log("  GET /ntlm/v2       - NTLM v2 protected (user or admin)");
-  console.log("  GET /ntlm/v2/admin - NTLM v2 admin only");
-  console.log("");
-  console.log("Users:");
-  console.log("  user:password  - normal role");
-  console.log("  admin:admin123 - admin role");
+  logger.info(
+    {
+      port: PORT,
+      url: `http://localhost:${PORT}`,
+    },
+    "NTLM mock server started",
+  );
+
+  logger.info(
+    {
+      endpoints: [
+        {
+          path: "GET /ntlm/v1",
+          description: "NTLM v1 protected (user or admin)",
+        },
+        { path: "GET /ntlm/v1/admin", description: "NTLM v1 admin only" },
+        {
+          path: "GET /ntlm/v2",
+          description: "NTLM v2 protected (user or admin)",
+        },
+        { path: "GET /ntlm/v2/admin", description: "NTLM v2 admin only" },
+        { path: "GET /health", description: "Health check" },
+      ],
+    },
+    "Available endpoints",
+  );
+
+  logger.info({ users: users }, "Available users");
 });

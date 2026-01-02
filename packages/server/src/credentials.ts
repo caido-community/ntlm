@@ -1,3 +1,5 @@
+import { logger } from "./logger.js";
+
 export type UserRole = "normal" | "admin";
 
 export type User = {
@@ -6,11 +8,20 @@ export type User = {
   role: UserRole;
 };
 
-const users: User[] = [
+export const users: User[] = [
   { username: "user", password: "password", role: "normal" },
   { username: "admin", password: "admin123", role: "admin" },
 ];
 
 export function findUser(username: string): User | undefined {
-  return users.find((u) => u.username.toLowerCase() === username.toLowerCase());
+  logger.debug({ username, totalUsers: users.length }, "Looking up user");
+  const user = users.find(
+    (u) => u.username.toLowerCase() === username.toLowerCase(),
+  );
+  if (user) {
+    logger.debug({ username: user.username, role: user.role }, "User found");
+  } else {
+    logger.debug({ username }, "User not found");
+  }
+  return user;
 }
