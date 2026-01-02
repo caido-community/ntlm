@@ -18,6 +18,9 @@ import {
 } from "shared";
 
 import { findUser, type User } from "./credentials.js";
+import { logger as parentLogger } from "./logger.js";
+
+const logger = parentLogger.child({ module: "ntlm" });
 
 export type NtlmState = {
   stage: "initial" | "challenge_sent" | "authenticated";
@@ -63,9 +66,14 @@ export function generateType2(version: NtlmVersion): {
   return { header, challenge };
 }
 
-export function parseType3(authHeader: string): NtlmType3Message | undefined {
+export function parseType3(
+  authHeader: string,
+  version: NtlmVersion,
+  type2Message?: NtlmType2Message,
+): NtlmType3Message | undefined {
   try {
-    return decodeType3Message(authHeader);
+    const encoding = type2Message?.encoding ?? "ascii";
+    return decodeType3Message(authHeader, { encoding, version });
   } catch {
     return undefined;
   }
@@ -80,13 +88,25 @@ function validateType3V1(
   const expectedNtlm = createNTLMResponse(challenge, ntlmHash);
 
   if (type3.ntlmResponse.equals(expectedNtlm)) {
+    logger.debug(
+      { username: user.username },
+      "NTLM response validation successful",
+    );
     return true;
   }
 
   const lmHash = createLMHash(user.password);
   const expectedLm = createLMResponse(challenge, lmHash);
 
-  return type3.lmResponse.equals(expectedLm);
+  if (type3.lmResponse.equals(expectedLm)) {
+    logger.debug(
+      { username: user.username },
+      "LM response validation successful",
+    );
+    return true;
+  }
+
+  return false;
 }
 
 function validateType3V2(
@@ -95,10 +115,18 @@ function validateType3V2(
   user: User,
 ): boolean {
   if (type3.lmResponse.length < 24) {
+    logger.debug(
+      {
+        username: user.username,
+        lmResponseLength: type3.lmResponse.length,
+      },
+      "LM response length validation failed",
+    );
     return false;
   }
 
   if (!type2Message.targetInfo) {
+    logger.debug({ username: user.username }, "Target info validation failed");
     return false;
   }
 
@@ -116,10 +144,21 @@ function validateType3V2(
   );
 
   if (!type3.lmResponse.equals(expectedLmv2)) {
+    logger.debug(
+      { username: user.username },
+      "LMv2 response validation failed",
+    );
     return false;
   }
 
   if (type3.ntlmResponse.length < 48) {
+    logger.debug(
+      {
+        username: user.username,
+        ntlmResponseLength: type3.ntlmResponse.length,
+      },
+      "NTLM response length validation failed",
+    );
     return false;
   }
 
@@ -156,7 +195,12 @@ function validateType3V2(
   const expectedHmac = hmac.digest();
   const receivedHmac = type3.ntlmResponse.subarray(0, 16);
 
-  return expectedHmac.equals(receivedHmac);
+  if (!expectedHmac.equals(receivedHmac)) {
+    logger.debug({ username: user.username }, "NTLMv2 HMAC validation failed");
+    return false;
+  }
+
+  return true;
 }
 
 export function validateType3(

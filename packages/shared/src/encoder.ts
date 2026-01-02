@@ -194,23 +194,21 @@ export function createType3Message(
 
   const resolvedDomain = domain ?? type2Message.targetName;
 
-  buf.write(NTLM_SIGNATURE, 0, NTLM_SIGNATURE.length, "ascii"); // Protocol
+  // Protocol
+  buf.write(NTLM_SIGNATURE, 0, NTLM_SIGNATURE.length, "ascii");
 
-  buf.writeUInt32LE(3, 8); // Message Type
+  // Message Type
+  buf.writeUInt32LE(3, 8);
 
   if (type2Message.version === 2) {
+    // NOTE: Some implementations seem to negotiate extended security.
+    // See https://github.com/SamDecrock/node-http-ntlm/blob/4ff6db8412808bb85467f418de76b8e490ccb3fb/ntlm.js#L194
     dataPos = 64;
-
     const ntlmHash = createNTLMHash(password);
     const nonce = createPseudoRandomValue(16);
+
+    // LMv2 security buffer
     const lmv2 = createLMv2Response(
-      type2Message,
-      username,
-      ntlmHash,
-      nonce,
-      resolvedDomain,
-    );
-    const ntlmv2 = createNTLMv2Response(
       type2Message,
       username,
       ntlmHash,
@@ -225,6 +223,15 @@ export function createType3Message(
     lmv2.copy(buf, dataPos); // Write LMv2 response data
     dataPos += lmv2.length;
 
+    // NTLMv2 security buffer
+    const ntlmv2 = createNTLMv2Response(
+      type2Message,
+      username,
+      ntlmHash,
+      nonce,
+      resolvedDomain,
+    );
+
     buf.writeUInt16LE(ntlmv2.length, 20); // NTLM response length
     buf.writeUInt16LE(ntlmv2.length, 22); // NTLM response max length
     buf.writeUInt32LE(dataPos, 24); // NTLM response offset
@@ -234,9 +241,9 @@ export function createType3Message(
   } else {
     const lmHash = createLMHash(password);
     const ntlmHash = createNTLMHash(password);
-    const lm = createLMResponse(type2Message.challenge, lmHash);
-    const ntlm = createNTLMResponse(type2Message.challenge, ntlmHash);
 
+    // LM security buffer
+    const lm = createLMResponse(type2Message.challenge, lmHash);
     buf.writeUInt16LE(lm.length, 12); // LM response length
     buf.writeUInt16LE(lm.length, 14); // LM response max length
     buf.writeUInt32LE(dataPos, 16); // LM response offset
@@ -244,6 +251,8 @@ export function createType3Message(
     lm.copy(buf, dataPos); // Write LM response data
     dataPos += lm.length;
 
+    // NTLM security buffer
+    const ntlm = createNTLMResponse(type2Message.challenge, ntlmHash);
     buf.writeUInt16LE(ntlm.length, 20); // NTLM response length
     buf.writeUInt16LE(ntlm.length, 22); // NTLM response max length
     buf.writeUInt32LE(dataPos, 24); // NTLM response offset
@@ -252,6 +261,7 @@ export function createType3Message(
     dataPos += ntlm.length;
   }
 
+  // Domain
   const targetLength =
     type2Message.encoding === "ascii"
       ? resolvedDomain.length
@@ -262,6 +272,7 @@ export function createType3Message(
 
   dataPos += buf.write(resolvedDomain, dataPos, type2Message.encoding); // Write domain data
 
+  // Username
   const usernameLength =
     type2Message.encoding === "ascii" ? username.length : username.length * 2;
   buf.writeUInt16LE(usernameLength, 36); // Username length
@@ -270,6 +281,7 @@ export function createType3Message(
 
   dataPos += buf.write(username, dataPos, type2Message.encoding); // Write username data
 
+  // Workstation
   const workstationLength =
     type2Message.encoding === "ascii"
       ? workstation.length
@@ -280,6 +292,7 @@ export function createType3Message(
 
   dataPos += buf.write(workstation, dataPos, type2Message.encoding); // Write workstation data
 
+  // Session key
   if (type2Message.version === 2) {
     buf.writeUInt16LE(0, 52); // Session key length
     buf.writeUInt16LE(0, 54); // Session key max length
@@ -287,6 +300,12 @@ export function createType3Message(
 
     buf.writeUInt32LE(type2Message.flags, 60); // Flags
   }
+
+  // NOTE: Some implementations seem to send some more flags.
+  // See https://github.com/SamDecrock/node-http-ntlm/blob/4ff6db8412808bb85467f418de76b8e490ccb3fb/ntlm.js#L250-L253
+
+  // NOTE: Some implementations seem to send versions
+  // See https://github.com/SamDecrock/node-http-ntlm/blob/4ff6db8412808bb85467f418de76b8e490ccb3fb/ntlm.js#L255-L261
 
   return "NTLM " + buf.toString("base64", 0, dataPos);
 }

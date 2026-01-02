@@ -127,7 +127,7 @@ export function createNtlmMiddleware(version: NtlmVersion) {
           "Processing Type 3 message",
         );
 
-        const type3 = parseType3(authHeader);
+        const type3 = parseType3(authHeader, version, state.type2Message);
         if (!type3) {
           logger.warn(
             { connectionId, authHeader: authHeader.substring(0, 50) },

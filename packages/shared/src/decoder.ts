@@ -83,17 +83,20 @@ export function decodeType2Message(authHeader: string): NtlmType2Message {
     throw new Error(`Invalid message type: expected 2, got ${messageType}`);
   }
 
+  // Flags
   const flags = buf.readUInt32LE(20);
   const encoding: NtlmEncoding =
     flags & NTLMFLAG_NEGOTIATE_OEM ? "ascii" : "ucs2";
   const version: NtlmVersion = flags & NTLMFLAG_NEGOTIATE_NTLM2_KEY ? 2 : 1;
+
+  // Challenge
   const challenge = Buffer.alloc(8);
   buf.copy(challenge, 0, 24, 32);
 
+  // Target Name
+  let targetName = "";
   const targetNameLength = buf.readUInt16LE(12);
   const targetNameOffset = buf.readUInt32LE(16);
-
-  let targetName = "";
   if (targetNameLength > 0) {
     if (
       targetNameOffset + targetNameLength > buf.length ||
@@ -108,6 +111,7 @@ export function decodeType2Message(authHeader: string): NtlmType2Message {
     );
   }
 
+  // Target Info
   let targetInfo: NtlmTargetInfo | undefined;
   if (flags & NTLMFLAG_NEGOTIATE_TARGET_INFO) {
     const targetInfoLength = buf.readUInt16LE(40);
@@ -184,7 +188,15 @@ export function decodeType2Message(authHeader: string): NtlmType2Message {
   };
 }
 
-export function decodeType3Message(authHeader: string): NtlmType3Message {
+export type DecodeType3MessageOptions = {
+  encoding: NtlmEncoding;
+  version: NtlmVersion;
+};
+
+export function decodeType3Message(
+  authHeader: string,
+  options: DecodeType3MessageOptions,
+): NtlmType3Message {
   const token = extractNtlmToken(authHeader);
   const buf = Buffer.from(token, "base64");
 
@@ -224,32 +236,47 @@ export function decodeType3Message(authHeader: string): NtlmType3Message {
   const workstationLength = buf.readUInt16LE(44);
   const workstationOffset = buf.readUInt32LE(48);
 
-  const hasUnicode = ntlmResponseLength > 24;
-  const encoding: NtlmEncoding = hasUnicode ? "ucs2" : "ascii";
+  let flags = 0;
+  if (options.version === 2) {
+    buf.readUInt16LE(52);
+    buf.readUInt16LE(54);
+    buf.readUInt32LE(56);
+
+    if (buf.length >= 64) {
+      flags = buf.readUInt32LE(60);
+    }
+  } else {
+    if (buf.length >= 64) {
+      flags = buf.readUInt32LE(60);
+    }
+  }
 
   const domain =
     domainLength > 0
-      ? buf.toString(encoding, domainOffset, domainOffset + domainLength)
+      ? buf.toString(
+          options.encoding,
+          domainOffset,
+          domainOffset + domainLength,
+        )
       : "";
 
   const username =
     usernameLength > 0
-      ? buf.toString(encoding, usernameOffset, usernameOffset + usernameLength)
+      ? buf.toString(
+          options.encoding,
+          usernameOffset,
+          usernameOffset + usernameLength,
+        )
       : "";
 
   const workstation =
     workstationLength > 0
       ? buf.toString(
-          encoding,
+          options.encoding,
           workstationOffset,
           workstationOffset + workstationLength,
         )
       : "";
-
-  let flags = 0;
-  if (buf.length >= 64) {
-    flags = buf.readUInt32LE(60);
-  }
 
   return {
     signature: NTLM_SIGNATURE,
