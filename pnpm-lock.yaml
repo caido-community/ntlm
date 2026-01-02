@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@caido/quickjs-types': 0.25.2
-
 importers:
 
   .:
