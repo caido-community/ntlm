@@ -22,6 +22,7 @@ const config: RawConfigurationOrFn = {
   },
   ignoreIssues: {
     "packages/server/src/credentials.ts": ["exports", "types"],
+    "packages/server/package.json": ["dependencies"],
   },
 };
 
