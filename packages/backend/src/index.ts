@@ -1,12 +1,7 @@
 import { Buffer } from "buffer";
 
 import type { DefineAPI, SDK } from "caido:plugin";
-import {
-  type Request,
-  RequestSpec,
-  type RequestSpecRaw,
-  type Response,
-} from "caido:utils";
+import { RequestSpec, type RequestSpecRaw } from "caido:utils";
 
 import {
   createType1Message,
@@ -86,6 +81,5 @@ export type API = DefineAPI<{
 
 export function init(sdk: SDK<API>) {
   sdk.api.register("generateRandomString", generateRandomString);
-  // @ts-expect-error - New event, not typed yet
   sdk.events.onUpstream(ntlm);
 }

@@ -1,6 +1,7 @@
 import { Buffer } from "buffer";
 import crypto from "crypto";
 
+// @ts-expect-error - No types available
 import des from "des.js";
 
 import type { NtlmType2Message } from "./types.js";
@@ -28,6 +29,7 @@ function calculateDES(key: Buffer, message: Buffer): Buffer {
       parity += (desKey[i]! >> j) % 2;
     }
 
+    // @ts-expect-error - i is max 8
     desKey[i] |= parity % 2 === 0 ? 1 : 0;
   }
 

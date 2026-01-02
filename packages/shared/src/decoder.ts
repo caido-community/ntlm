@@ -17,6 +17,7 @@ import type {
 
 function extractNtlmToken(authHeader: string): string {
   const ntlmMatch = /^NTLM ([^,\s]+)/.exec(authHeader);
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!ntlmMatch || !ntlmMatch[1]) {
     throw new Error("Couldn't find NTLM token in authorization header");
   }
