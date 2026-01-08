@@ -8,12 +8,12 @@ import tailwindcss from "tailwindcss";
 // @ts-expect-error no declared types at this time
 import tailwindPrimeui from "tailwindcss-primeui";
 
-const id = "frontend-vue";
+const id = "ntlm";
 export default defineConfig({
   id,
-  name: "Frontend Vue",
-  description: "Plugin template with frontend using VueJS",
-  version: "0.0.0",
+  name: "NTLM Authentication",
+  description: "Plugin for NTLM authentication",
+  version: "0.1.0",
   author: {
     name: "Caido Labs Inc.",
     email: "dev@caido.io",
@@ -22,15 +22,15 @@ export default defineConfig({
   plugins: [
     {
       kind: "backend",
-      id: "backend",
+      id: "ntlm-backend",
       root: "packages/backend",
     },
     {
       kind: "frontend",
-      id: "frontend",
+      id: "ntlm-frontend",
       root: "packages/frontend",
       backend: {
-        id: "backend",
+        id: "ntlm-backend",
       },
       vite: {
         plugins: [vue()],

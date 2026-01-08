@@ -7,6 +7,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "minimatch": "^10.0.1",
     "shared": "workspace:*"
   },
   "devDependencies": {

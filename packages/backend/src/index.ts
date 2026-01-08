@@ -3,11 +3,14 @@ import { Buffer } from "buffer";
 import type { DefineAPI, SDK } from "caido:plugin";
 import { RequestSpec, type RequestSpecRaw } from "caido:utils";
 
+import type { NtlmConfig, RuleConfig } from "./config.js";
 import {
   createType1Message,
   createType3Message,
   decodeType2Message,
 } from "./ntlm.js";
+import { Rule as NtlmRule } from "./server.js";
+import { loadConfig, saveConfig } from "./store.js";
 
 export type ConnectionInfo = {
   host: string;
@@ -15,18 +18,42 @@ export type ConnectionInfo = {
   is_tls: boolean;
 };
 
-const generateRandomString = (sdk: SDK, length: number) => {
-  const randomString = Math.random()
-    .toString(36)
-    .substring(2, length + 2);
-  sdk.console.log(`Generating random string: ${randomString}`);
-  return randomString;
-};
+let config: NtlmConfig = { rules: [] };
+let rules: NtlmRule[] = [];
+
+function getConfig(sdk: SDK): NtlmConfig {
+  return config;
+}
+
+async function saveConfigAPI(sdk: SDK, newConfig: NtlmConfig): Promise<void> {
+  config = newConfig;
+  rules = config.rules
+    .filter((ruleConfig) => ruleConfig.enabled === true)
+    .map((ruleConfig: RuleConfig) => new NtlmRule(ruleConfig));
+  await saveConfig(sdk, config);
+}
 
 const ntlm = async (sdk: SDK, request: RequestSpecRaw) => {
   try {
     const spec2 = request.toSpec();
+    const domain = request.getHost();
     sdk.console.log(`Connecting to ${spec2.getUrl()}`);
+
+    let matchingRule: NtlmRule | undefined = undefined;
+    for (const rule of rules) {
+      if (rule.matches(domain) === true) {
+        matchingRule = rule;
+        break;
+      }
+    }
+
+    if (matchingRule === undefined) {
+      sdk.console.log(`No matching rule configuration for domain: ${domain}`);
+      return undefined;
+    }
+
+    const credentials = matchingRule.getCredentials();
+    sdk.console.log(`Using rule configuration: ${matchingRule.getName()}`);
 
     // Send the type 1 message
     const type1Message = createType1Message("", "");
@@ -52,7 +79,11 @@ const ntlm = async (sdk: SDK, request: RequestSpecRaw) => {
 
     // Create the type 3 message
     sdk.console.log(`Creating type 3 message`);
-    const type3Message = createType3Message(type2Message, "user", "password");
+    const type3Message = createType3Message(
+      type2Message,
+      credentials.username,
+      credentials.password,
+    );
 
     // Send the type 3 message
     sdk.console.log(`Setting authorization header: ${type3Message}`);
@@ -76,10 +107,19 @@ const ntlm = async (sdk: SDK, request: RequestSpecRaw) => {
 };
 
 export type API = DefineAPI<{
-  generateRandomString: typeof generateRandomString;
+  getConfig: typeof getConfig;
+  saveConfig: typeof saveConfigAPI;
 }>;
 
-export function init(sdk: SDK<API>) {
-  sdk.api.register("generateRandomString", generateRandomString);
+export type { CredentialSet, NtlmConfig, RuleConfig } from "./config.js";
+
+export async function init(sdk: SDK<API>) {
+  config = await loadConfig(sdk);
+  rules = config.rules
+    .filter((ruleConfig) => ruleConfig.enabled === true)
+    .map((ruleConfig: RuleConfig) => new NtlmRule(ruleConfig));
+
+  sdk.api.register("getConfig", getConfig);
+  sdk.api.register("saveConfig", saveConfigAPI);
   sdk.events.onUpstream(ntlm);
 }

@@ -9,7 +9,7 @@ import {
 } from "./middleware.js";
 
 const app = express();
-const PORT = 3000;
+const PORT = 3010;
 
 logger.info({ port: PORT }, "Initializing Express application");
 

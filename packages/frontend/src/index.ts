@@ -1,5 +1,6 @@
 import { Classic } from "@caido/primevue";
 import PrimeVue from "primevue/config";
+import { createPinia } from "pinia";
 import { createApp } from "vue";
 
 import { SDKPlugin } from "./plugins/sdk";
@@ -10,12 +11,16 @@ import App from "./views/App.vue";
 // This is the entry point for the frontend plugin
 export const init = (sdk: FrontendSDK) => {
   const app = createApp(App);
+  const pinia = createPinia();
 
   // Load the PrimeVue component library
   app.use(PrimeVue, {
     unstyled: true,
     pt: Classic,
   });
+
+  // Load Pinia
+  app.use(pinia);
 
   // Provide the FrontendSDK
   app.use(SDKPlugin, sdk);
@@ -35,12 +40,11 @@ export const init = (sdk: FrontendSDK) => {
   // Mount the app to the root element
   app.mount(root);
 
-  // Add the page to the navigation
-  // Make sure to use a unique name for the page
-  sdk.navigation.addPage("/my-plugin", {
+  sdk.navigation.addPage("/ntlm", {
     body: root,
   });
 
-  // Add a sidebar item
-  sdk.sidebar.registerItem("My Plugin", "/my-plugin");
+  sdk.sidebar.registerItem("NTLM", "/ntlm", {
+    icon: "fas fa-shield",
+  });
 };

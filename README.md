@@ -8,3 +8,6 @@ This template should be used as a starting point for creating a new plugin with 
 - [TypeScript](https://www.typescriptlang.org/)
 - [VueJS](https://vuejs.org/)
 - [PrimeVue](https://primevue.org/) for UI components
+
+https://github.com/m0rtadelo/ntlm-client
+https://github.com/SamDecrock/node-http-ntlm
