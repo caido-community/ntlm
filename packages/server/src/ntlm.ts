@@ -87,26 +87,23 @@ function validateType3V1(
   const ntlmHash = createNTLMHash(user.password);
   const expectedNtlm = createNTLMResponse(challenge, ntlmHash);
 
-  if (type3.ntlmResponse.equals(expectedNtlm)) {
+  if (!type3.ntlmResponse.equals(expectedNtlm)) {
     logger.debug(
       { username: user.username },
-      "NTLM response validation successful",
+      "NTLM response validation failed",
     );
-    return true;
+    return false;
   }
 
   const lmHash = createLMHash(user.password);
   const expectedLm = createLMResponse(challenge, lmHash);
 
-  if (type3.lmResponse.equals(expectedLm)) {
-    logger.debug(
-      { username: user.username },
-      "LM response validation successful",
-    );
-    return true;
+  if (!type3.lmResponse.equals(expectedLm)) {
+    logger.debug({ username: user.username }, "LM response validation failed");
+    return false;
   }
 
-  return false;
+  return true;
 }
 
 function validateType3V2(
