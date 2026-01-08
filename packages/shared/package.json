@@ -11,9 +11,6 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc"
   },
-  "dependencies": {
-    "des.js": "1.1.0"
-  },
   "devDependencies": {
     "@caido/sdk-backend": "0.55.0-beta.0"
   }

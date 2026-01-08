@@ -1,14 +1,7 @@
 import { Buffer } from "buffer";
 import crypto from "crypto";
 
-// @ts-expect-error - No types available
-import des from "des.js";
-
 import type { NtlmType2Message } from "./types.js";
-
-function createDesEncrypt(key: Buffer) {
-  return des.DES.create({ type: "encrypt", key: key });
-}
 
 function calculateDES(key: Buffer, message: Buffer): Buffer {
   const desKey = Buffer.alloc(8);
@@ -33,8 +26,9 @@ function calculateDES(key: Buffer, message: Buffer): Buffer {
     desKey[i] |= parity % 2 === 0 ? 1 : 0;
   }
 
-  const desInstance = createDesEncrypt(desKey);
-  return Buffer.from(desInstance.update(message));
+  // @ts-expect-error - createCipheriv is not typed
+  const des = crypto.createCipheriv("DES-ECB", desKey, "");
+  return des.update(message);
 }
 
 export function createLMResponse(challenge: Buffer, lmhash: Buffer): Buffer {
