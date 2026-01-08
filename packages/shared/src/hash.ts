@@ -26,7 +26,8 @@ function calculateDES(key: Buffer, message: Buffer): Buffer {
     desKey[i] |= parity % 2 === 0 ? 1 : 0;
   }
 
-  // @ts-expect-error - createCipheriv is not typed
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - createCipheriv is not typed
   const des = crypto.createCipheriv("DES-ECB", desKey, "");
   return des.update(message);
 }
