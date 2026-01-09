@@ -36,25 +36,31 @@ const resetForm = () => {
   denyListText.value = "";
 };
 
+const populateForm = (rule?: RuleConfig) => {
+  if (rule !== undefined) {
+    formData.value = {
+      id: rule.id,
+      name: rule.name,
+      enabled: rule.enabled,
+      credentials: {
+        username: rule.credentials.username,
+        password: rule.credentials.password,
+      },
+      allowList: [...rule.allowList],
+      denyList: [...rule.denyList],
+    };
+    allowListText.value = rule.allowList.join("\n");
+    denyListText.value = rule.denyList.join("\n");
+  } else {
+    resetForm();
+  }
+};
+
 watch(
   () => props.rule,
   (rule) => {
-    if (rule !== undefined) {
-      formData.value = {
-        id: rule.id,
-        name: rule.name,
-        enabled: rule.enabled,
-        credentials: {
-          username: rule.credentials.username,
-          password: rule.credentials.password,
-        },
-        allowList: [...rule.allowList],
-        denyList: [...rule.denyList],
-      };
-      allowListText.value = rule.allowList.join("\n");
-      denyListText.value = rule.denyList.join("\n");
-    } else {
-      resetForm();
+    if (isOpen.value) {
+      populateForm(rule);
     }
   },
   { immediate: true },
@@ -63,7 +69,9 @@ watch(
 watch(
   () => isOpen.value,
   (open) => {
-    if (!open) {
+    if (open) {
+      populateForm(props.rule);
+    } else {
       resetForm();
     }
   },
