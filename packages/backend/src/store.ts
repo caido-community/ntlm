@@ -7,7 +7,7 @@ import type { NtlmConfig } from "./config.js";
 
 const CONFIG_FILE_NAME = "ntlm-config.json";
 
-export function getConfigPath(sdk: SDK): string {
+function getConfigPath(sdk: SDK): string {
   const pluginPath = sdk.meta.path();
   return join(pluginPath, CONFIG_FILE_NAME);
 }
