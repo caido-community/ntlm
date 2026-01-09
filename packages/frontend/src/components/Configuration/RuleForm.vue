@@ -6,6 +6,7 @@ import ToggleSwitch from "primevue/toggleswitch";
 import { computed, ref, watch } from "vue";
 
 import type { RuleConfig } from "@/types";
+import { emptyRule } from "@/utils";
 
 const props = defineProps<{
   modelValue: boolean;
@@ -24,19 +25,17 @@ const isOpen = computed({
 });
 
 const formData = ref<RuleConfig>({
-  id: crypto.randomUUID(),
-  name: "",
-  enabled: true,
-  credentials: {
-    username: "",
-    password: "",
-  },
-  allowList: [],
-  denyList: [],
+  ...emptyRule(),
 });
 
 const allowListText = ref("");
 const denyListText = ref("");
+
+const resetForm = () => {
+  formData.value = emptyRule();
+  allowListText.value = "";
+  denyListText.value = "";
+};
 
 watch(
   () => props.rule,
@@ -56,22 +55,19 @@ watch(
       allowListText.value = rule.allowList.join("\n");
       denyListText.value = rule.denyList.join("\n");
     } else {
-      formData.value = {
-        id: crypto.randomUUID(),
-        name: "",
-        enabled: true,
-        credentials: {
-          username: "",
-          password: "",
-        },
-        allowList: [],
-        denyList: [],
-      };
-      allowListText.value = "";
-      denyListText.value = "";
+      resetForm();
     }
   },
   { immediate: true },
+);
+
+watch(
+  () => isOpen.value,
+  (open) => {
+    if (!open) {
+      resetForm();
+    }
+  },
 );
 
 const handleSave = () => {
