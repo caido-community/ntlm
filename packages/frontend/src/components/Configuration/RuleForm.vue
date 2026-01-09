@@ -2,7 +2,6 @@
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
-import ToggleSwitch from "primevue/toggleswitch";
 import { computed, ref, watch } from "vue";
 
 import type { RuleConfig } from "@/types";
@@ -108,11 +107,6 @@ const handleCancel = () => {
         />
       </div>
 
-      <div>
-        <label class="block text-sm font-medium mb-1">Enabled</label>
-        <ToggleSwitch v-model="formData.enabled" />
-      </div>
-
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-sm font-medium mb-1">Username</label>
@@ -160,7 +154,7 @@ const handleCancel = () => {
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <Button label="Cancel" severity="secondary" @click="handleCancel" />
+        <Button label="Cancel" severity="contrast" text @click="handleCancel" />
         <Button label="Save" @click="handleSave" />
       </div>
     </template>
