@@ -1,13 +1,51 @@
-# VueJS Frontend Template
+<div align="center">
+  <img width="1000" alt="image" src="https://github.com/caido-community/.github/blob/main/content/banner.png?raw=true">
 
-This template should be used as a starting point for creating a new plugin with a VueJS frontend.
+  <br />
+  <br />
+  <a href="https://github.com/caido-community" target="_blank">Github</a>
+  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+  <a href="https://developer.caido.io/" target="_blank">Documentation</a>
+  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+  <a href="https://links.caido.io/www-discord" target="_blank">Discord</a>
+  <br />
+  <hr />
+</div>
 
-## Features
+# NTLM
 
-- [pnpm](https://pnpm.io/) as package manager
-- [TypeScript](https://www.typescriptlang.org/)
-- [VueJS](https://vuejs.org/)
-- [PrimeVue](https://primevue.org/) for UI components
+Caido upstream plugin to handle Ntlm authentication.
 
-https://github.com/m0rtadelo/ntlm-client
-https://github.com/SamDecrock/node-http-ntlm
+<img width="646" height="268" alt="Settings" src="https://github.com/user-attachments/assets/29584013-60ea-461a-81f6-778c28807606" />
+
+## Installation
+
+### From Plugin Store
+
+1. Install via the Caido Plugin Store
+2. Navigate to `Settings`, open `ntlm`
+3. Configure your
+
+### Manual Installation
+
+1. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+2. Build the plugin:
+
+   ```bash
+   pnpm build
+   ```
+
+3. Install in Caido:
+   - Upload the `dist/plugin_package.zip` file by clicking "Install Package" in Caido's plugin settings
+
+### Acknowledgments
+
+Many thanks for the NTLM encoding and decoding algorithms!
+
+- [ntlm-client](https://github.com/m0rtadelo/ntlm-client)
+- [node-http-ntlm](https://github.com/SamDecrock/node-http-ntlm)
