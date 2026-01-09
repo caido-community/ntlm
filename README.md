@@ -14,7 +14,7 @@
 
 # NTLM
 
-Caido upstream plugin to handle Ntlm authentication.
+Caido upstream plugin to handle Microsoft [NTLM](https://en.wikipedia.org/wiki/NTLM) authentication.
 
 <img width="646" height="268" alt="Settings" src="https://github.com/user-attachments/assets/29584013-60ea-461a-81f6-778c28807606" />
 
