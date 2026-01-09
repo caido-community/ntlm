@@ -6,9 +6,11 @@ import RuleForm from "./RuleForm.vue";
 import RuleTable from "./RuleTable.vue";
 
 import { useConfigStore } from "@/stores/config";
+import { useUpstreamStore } from "@/stores/upstream";
 import type { RuleConfig } from "@/types";
 
 const store = useConfigStore();
+const upstreamStore = useUpstreamStore();
 
 const showForm = ref(false);
 const editingRule = ref<RuleConfig | undefined>();
@@ -38,6 +40,10 @@ const handleSaveRule = async (rule: RuleConfig, index?: number) => {
   }
   await store.saveConfig();
 };
+
+const handleAddAsUpstream = (rule: RuleConfig) => {
+  upstreamStore.addRuleAsUpstream(rule);
+};
 </script>
 
 <template>
@@ -51,7 +57,11 @@ const handleSaveRule = async (rule: RuleConfig, index?: number) => {
       No rules configured. Click "Add Rule" to get started.
     </div>
 
-    <RuleTable v-else @edit="handleEditRule" />
+    <RuleTable
+      v-else
+      @edit="handleEditRule"
+      @add-as-upstream="handleAddAsUpstream"
+    />
 
     <RuleForm
       v-model="showForm"

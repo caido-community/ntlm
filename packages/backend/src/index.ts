@@ -33,6 +33,11 @@ async function saveConfigAPI(sdk: SDK, newConfig: NtlmConfig): Promise<void> {
   await saveConfig(sdk, config);
 }
 
+function getPluginId(sdk: SDK): string {
+  // @ts-expect-error no declared types at this time
+  return sdk.meta.id();
+}
+
 const ntlm = async (sdk: SDK, request: RequestSpecRaw) => {
   try {
     const spec2 = request.toSpec();
@@ -109,6 +114,7 @@ const ntlm = async (sdk: SDK, request: RequestSpecRaw) => {
 export type API = DefineAPI<{
   getConfig: typeof getConfig;
   saveConfig: typeof saveConfigAPI;
+  getPluginId: typeof getPluginId;
 }>;
 
 export type { CredentialSet, NtlmConfig, RuleConfig } from "./config.js";
@@ -121,5 +127,6 @@ export async function init(sdk: SDK<API>) {
 
   sdk.api.register("getConfig", getConfig);
   sdk.api.register("saveConfig", saveConfigAPI);
+  sdk.api.register("getPluginId", getPluginId);
   sdk.events.onUpstream(ntlm);
 }

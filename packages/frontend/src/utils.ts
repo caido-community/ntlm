@@ -1,5 +1,10 @@
 import type { RuleConfig } from "@/types";
 
+// eslint-disable-next-line @typescript-eslint/no-restricted-types
+type UndefinedOrNull = null | undefined;
+
+export type Maybe<T> = T | UndefinedOrNull;
+
 export const emptyRule = (): RuleConfig => ({
   id: crypto.randomUUID(),
   name: "",
@@ -11,3 +16,7 @@ export const emptyRule = (): RuleConfig => ({
   allowList: [],
   denyList: [],
 });
+
+export const isAbsent = <T>(value: Maybe<T>): value is UndefinedOrNull => {
+  return value === undefined || value === null;
+};

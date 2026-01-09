@@ -9,6 +9,7 @@ import type { RuleConfig } from "@/types";
 
 defineProps<{
   onEdit: (rule: RuleConfig, index: number) => void;
+  onAddAsUpstream: (rule: RuleConfig) => void;
 }>();
 
 const store = useConfigStore();
@@ -67,14 +68,26 @@ const handleRemoveRule = async (index: number) => {
         <div class="flex gap-2">
           <Button
             icon="fas fa-edit"
-            severity="secondary"
+            severity="contrast"
             size="small"
+            text
             @click="onEdit(data, index)"
+          />
+          <Button
+            v-tooltip.bottom="{
+              value: 'Add as upstream plugin',
+            }"
+            icon="fas fa-square-plus"
+            severity="contrast"
+            size="small"
+            text
+            @click="onAddAsUpstream(data)"
           />
           <Button
             icon="fas fa-trash"
             severity="danger"
             size="small"
+            text
             @click="handleRemoveRule(index)"
           />
         </div>
