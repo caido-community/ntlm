@@ -73,7 +73,9 @@ const ntlm = async (sdk: SDK, request: RequestSpecRaw) => {
         "ascii",
       )}`,
     );
-    const { response, connection } = await sdk.requests.send(spec);
+    const { response, connection } = await sdk.requests.send(spec, {
+      save: false,
+    });
 
     sdk.console.log(`Response: ${response.getRaw()?.toText()}`);
 
