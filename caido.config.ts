@@ -13,7 +13,7 @@ export default defineConfig({
   id,
   name: "NTLM Authentication",
   description: "Plugin for NTLM authentication",
-  version: "0.1.0",
+  version: "0.1.1",
   author: {
     name: "Caido Labs Inc.",
     email: "dev@caido.io",
