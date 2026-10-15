@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="1000" alt="image" src="https://github.com/caido-community/.github/blob/main/content/banner.png?raw=true">
+  <img width="1000" alt="image" src="assets/banner.png">
 
   <br />
   <br />
@@ -16,7 +16,7 @@
 
 Caido upstream plugin to handle Microsoft [NTLM](https://en.wikipedia.org/wiki/NTLM) authentication.
 
-<img width="646" height="268" alt="Settings" src="https://github.com/user-attachments/assets/29584013-60ea-461a-81f6-778c28807606" />
+<img width="646" height="268" alt="Settings" src="assets/settings.png" />
 
 ## Installation
 
